@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:curved_navigation_bar/curved_navigation_bar.dart'; // Add this dependency in pubspec.yaml
 import 'dashboardscreen.dart';
 import 'profile.dart';
 
@@ -14,7 +15,7 @@ class NavigationWrapper extends StatefulWidget {
 }
 
 class _NavigationWrapperState extends State<NavigationWrapper> {
-  int _currentIndex = 0; // Track the current tab index
+  int _currentIndex = 2; // Set Home (center item) as the default selected tab
 
   late final List<Widget> _screens;
 
@@ -23,44 +24,60 @@ class _NavigationWrapperState extends State<NavigationWrapper> {
     super.initState();
     // Initialize screens, passing userId and token where required
     _screens = [
-      DashboardScreen(userId: widget.userId, token: widget.token),
       Center(child: Text('Users Screen')), // Placeholder for Users
-      Center(
-          child: Text('Notifications Screen')), // Placeholder for Notifications
       ProfileScreen(userId: widget.userId, token: widget.token),
-      Center(
-          child: Text('Create Order Screen')), // Placeholder for Create Order
-      Center(
-          child: Text(
-              'Manage Products Screen')), // Placeholder for Manage Products
+      DashboardScreen(userId: widget.userId, token: widget.token),
+      Center(child: Text('Create Order Screen')), // Placeholder for Create Order
+      Center(child: Text('Manage Products Screen')), // Placeholder for Manage Products
     ];
-  }
-
-  void _onTabTapped(int index) {
-    setState(() {
-      _currentIndex = index; // Update the selected tab index
-    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: _screens[_currentIndex], // Display the current screen
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: _onTabTapped, // Handle tab changes
-        type: BottomNavigationBarType.fixed,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.group), label: 'Users'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.notifications), label: 'Notifications'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.add_shopping_cart), label: 'Create Order'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.inventory), label: 'Manage Products'),
+      bottomNavigationBar: CurvedNavigationBar(
+        index: _currentIndex,
+        height: 60,
+        backgroundColor: Colors.white,
+        color: const Color(0xFF9278F9), // Purple theme color
+        buttonBackgroundColor: Colors.white,
+       
+    
+        animationDuration: const Duration(milliseconds: 300),
+        animationCurve: Curves.easeInOut,
+        items: [
+          Icon(
+            Icons.group,
+            size: 30,
+            color: _currentIndex == 0 ? const Color(0xFF9278F9) : Colors.white,
+          ),
+          Icon(
+            Icons.person,
+            size: 30,
+            color: _currentIndex == 1 ? const Color(0xFF9278F9) : Colors.white,
+          ),
+          Icon(
+            Icons.home,
+            size: 30,
+            color: _currentIndex == 2 ? const Color(0xFF9278F9) : Colors.white,
+          ),
+          Icon(
+            Icons.add_shopping_cart,
+            size: 30,
+            color: _currentIndex == 3 ? const Color(0xFF9278F9) : Colors.white,
+          ),
+          Icon(
+            Icons.inventory,
+            size: 30,
+            color: _currentIndex == 4 ? const Color(0xFF9278F9) : Colors.white,
+          ),
         ],
+        onTap: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
       ),
     );
   }
