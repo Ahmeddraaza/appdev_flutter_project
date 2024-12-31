@@ -1,7 +1,7 @@
-import 'package:appdev_flutter_project/screens/dashboardscreen.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'navigationwrapper.dart'; // Import the NavigationWrapper
 
 class SignInScreen extends StatefulWidget {
   @override
@@ -24,8 +24,8 @@ class _SignInScreenState extends State<SignInScreen> {
 
     final url = Uri.parse('http://localhost:3001/auth/login');
     final body = {
-      'email': _emailController.text,
-      'password': _passwordController.text,
+      'email': _emailController.text.trim(),
+      'password': _passwordController.text.trim(),
     };
 
     setState(() {
@@ -39,35 +39,44 @@ class _SignInScreenState extends State<SignInScreen> {
         body: jsonEncode(body),
       );
 
-       if (response.statusCode == 200) {
-      final responseData = jsonDecode(response.body);
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
 
-      // Check the message or success field in the response
-      if (responseData['msg'] == 'LOGGED IN') {
-        _showSnackBar("Login successful!", Colors.green);
-        print('Login successful: $responseData');
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => DashboardScreen(userId: '', token: '',)),
-        );
-        // Navigate to the next screen or show a success message
+        if (responseData['msg'] == 'LOGGED IN') {
+          _showSnackBar("Login successful!", Colors.green);
+          print('Login successful: $responseData');
+
+          // Extract userId and token from the response
+          final userId = responseData['user_id'];
+          final token = responseData['token'];
+
+          // Navigate to NavigationWrapper instead of DashboardScreen
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => NavigationWrapper(
+                userId: userId,
+                token: token,
+              ),
+            ),
+          );
+        } else {
+          _showSnackBar(responseData['msg'], Colors.red);
+          print('Login failed: $responseData');
+        }
       } else {
-        _showSnackBar(responseData['msg'], Colors.red); // Display error message from API
-        print('Login failed: $responseData');
+        _showSnackBar("An error occurred. Please try again.", Colors.red);
+        print('Login failed: ${response.body}');
       }
-    } else {
+    } catch (error) {
       _showSnackBar("An error occurred. Please try again.", Colors.red);
-      print('Login failed: ${response.body}');
+      print('An error occurred: $error');
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
     }
-  } catch (error) {
-    _showSnackBar("An error occurred. Please try again.", Colors.red);
-    print('An error occurred: $error');
-  } finally {
-    setState(() {
-      _isLoading = false;
-    });
   }
-}
 
   void _showSnackBar(String message, Color color) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -122,7 +131,9 @@ class _SignInScreenState extends State<SignInScreen> {
           AnimatedPositioned(
             duration: Duration(milliseconds: 500),
             curve: Curves.easeInOut,
-            bottom: _isContainerVisible ? 0 : -MediaQuery.of(context).size.height * 0.8,
+            bottom: _isContainerVisible
+                ? 0
+                : -MediaQuery.of(context).size.height * 0.8,
             left: 0,
             right: 0,
             child: Container(
@@ -134,7 +145,8 @@ class _SignInScreenState extends State<SignInScreen> {
                   topRight: Radius.circular(30),
                 ),
               ),
-              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 30.0),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 20.0, vertical: 30.0),
               child: SingleChildScrollView(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -149,7 +161,7 @@ class _SignInScreenState extends State<SignInScreen> {
                     ),
                     const SizedBox(height: 10),
                     const Text(
-                      'Sign in to my account',
+                      'Sign in to your account',
                       style: TextStyle(
                         fontSize: 16,
                         color: Colors.grey,
@@ -177,7 +189,9 @@ class _SignInScreenState extends State<SignInScreen> {
                         prefixIcon: const Icon(Icons.lock),
                         suffixIcon: IconButton(
                           icon: Icon(
-                            _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                            _isPasswordVisible
+                                ? Icons.visibility
+                                : Icons.visibility_off,
                           ),
                           onPressed: () {
                             setState(() {
@@ -218,7 +232,8 @@ class _SignInScreenState extends State<SignInScreen> {
                       onPressed: _isLoading ? null : _signIn,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF7A5AF8),
-                        padding: const EdgeInsets.symmetric(horizontal: 80, vertical: 15),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 80, vertical: 15),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30),
                         ),
@@ -232,49 +247,6 @@ class _SignInScreenState extends State<SignInScreen> {
                                 color: Colors.white,
                               ),
                             ),
-                    ),
-                    const SizedBox(height: 20),
-                    const Text('OR'),
-                    const SizedBox(height: 20),
-                    OutlinedButton.icon(
-                      onPressed: () {},
-                      icon: const Icon(Icons.badge, color: Color(0xFF7A5AF8)),
-                      label: const Text(
-                        'Sign in With Employee ID',
-                        style: TextStyle(color: Color(0xFF7A5AF8)),
-                      ),
-                      style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: Color(0xFF7A5AF8)),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    OutlinedButton.icon(
-                      onPressed: () {},
-                      icon: const Icon(Icons.phone, color: Color(0xFF7A5AF8)),
-                      label: const Text(
-                        'Sign in With Phone',
-                        style: TextStyle(color: Color(0xFF7A5AF8)),
-                      ),
-                      style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: Color(0xFF7A5AF8)),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 30),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Text("Don't have an account? "),
-                        TextButton(
-                          onPressed: () {},
-                          child: const Text('Sign Up Here'),
-                        ),
-                      ],
                     ),
                   ],
                 ),
