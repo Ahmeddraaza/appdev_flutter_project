@@ -15,11 +15,16 @@ class MonthlySalesGraphCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Fallback for empty data or invalid values
+    final validData = data.isNotEmpty ? data : [0.0];
+    final maxDataValue = validData.reduce(max);
+    final adjustedMaxValue = maxDataValue > 0 ? maxDataValue : 1; // Avoid division by zero
+
     return Center(
       child: Container(
         width: 340,
         height: 296,
-        margin: const EdgeInsets.symmetric(horizontal: 16), // Equal spacing on left and right
+        margin: const EdgeInsets.symmetric(horizontal: 16),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
         decoration: BoxDecoration(
           color: Colors.white,
@@ -51,7 +56,7 @@ class MonthlySalesGraphCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  "\$${data.reduce((a, b) => a + b).toStringAsFixed(2)}",
+                  "\$${validData.reduce((a, b) => a + b).toStringAsFixed(2)}",
                   style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -102,10 +107,11 @@ class MonthlySalesGraphCard extends StatelessWidget {
             Expanded(
               child: Center(
                 child: ListView.builder(
-                  itemCount: data.length,
+                  itemCount: validData.length,
                   itemBuilder: (context, index) {
                     final maxBarWidth = 150; // Maximum width for bars
-                    final barWidth = (data[index] / data.reduce(max)) * maxBarWidth;
+                    final barWidth =
+                        (validData[index] / adjustedMaxValue) * maxBarWidth;
                     final colorPalette = [
                       Colors.purple,
                       Colors.blue,
@@ -120,7 +126,7 @@ class MonthlySalesGraphCard extends StatelessWidget {
                           SizedBox(
                             width: 40,
                             child: Text(
-                              labels[index],
+                              labels.isNotEmpty ? labels[index] : "N/A",
                               style: const TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w500,
@@ -131,7 +137,7 @@ class MonthlySalesGraphCard extends StatelessWidget {
                           const SizedBox(width: 8),
                           Container(
                             height: 16,
-                            width: barWidth,
+                            width: barWidth.isFinite ? barWidth : 0.0, // Handle NaN or Infinite
                             decoration: BoxDecoration(
                               color: colorPalette[index % colorPalette.length],
                               borderRadius: BorderRadius.circular(4),
@@ -139,7 +145,7 @@ class MonthlySalesGraphCard extends StatelessWidget {
                           ),
                           const SizedBox(width: 8),
                           Text(
-                            "\$${data[index].toStringAsFixed(2)}",
+                            "\$${validData[index].toStringAsFixed(2)}",
                             style: const TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w500,

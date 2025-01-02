@@ -27,7 +27,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> fetchUserData() async {
-    final url = 'http://localhost:3001/user/getUser/${widget.userId}'; // API endpoint
+    final url = 'http://10.0.2.2:3001/user/getUser/${widget.userId}'; // API endpoint
 
     try {
       final response = await http.get(

@@ -22,7 +22,7 @@ class _SignInScreenState extends State<SignInScreen> {
       return;
     }
 
-    final url = Uri.parse('http://localhost:3001/auth/login');
+    final url = Uri.parse('http://10.0.2.2:3001/auth/login');
     final body = {
       'email': _emailController.text.trim(),
       'password': _passwordController.text.trim(),

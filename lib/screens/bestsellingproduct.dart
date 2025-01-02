@@ -29,7 +29,7 @@ class BestSellingProducts extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             // Title Section
-            SizedBox(
+            const SizedBox(
               width: double.infinity,
               child: Text(
                 'Best Selling Products',
@@ -63,37 +63,43 @@ class BestSellingProducts extends StatelessWidget {
                         ),
                       ),
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          // Product Name
-                          Expanded(
-                            flex: 3,
-                            child: Text(
-                              product['productName'],
-                              textAlign: TextAlign.left,
-                              style: TextStyle(
-                                color: Color(0xFF47178E),
-                                fontSize: 12,
-                                fontFamily: 'Albert Sans',
-                                fontWeight: FontWeight.w600,
-                              ),
+                          // Product Image
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(4),
+                            child: Image.network(
+                              product['image'] ?? '',
+                              width: 40,
+                              height: 40,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) =>
+                                  Icon(Icons.image_not_supported, size: 40),
                             ),
                           ),
-                          const SizedBox(width: 6.54),
+                          const SizedBox(width: 10),
 
-                          // Product Quantity
+                          // Product Name and Quantity
                           Expanded(
-                            flex: 1,
-                            child: Text(
-                              '${product['quantity']}',
-                              textAlign: TextAlign.right,
-                              style: TextStyle(
-                                color: Color(0xFF47168E),
-                                fontSize: 12,
-                                fontFamily: 'Albert Sans',
-                                fontWeight: FontWeight.w600,
-                              ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  product['productName'],
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF47178E),
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  'Quantity: ${product['quantity']}',
+                                  style: const TextStyle(
+                                    fontSize: 10,
+                                    color: Color(0xFF6C757D),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ],
@@ -109,3 +115,6 @@ class BestSellingProducts extends StatelessWidget {
     );
   }
 }
+  
+
+

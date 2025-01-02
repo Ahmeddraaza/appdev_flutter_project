@@ -57,7 +57,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Future<void> fetchUserFullName() async {
-    final url = Uri.parse('http://localhost:3001/user/getUser/${widget.userId}');
+    final url = Uri.parse('http://10.0.2.2:3001/user/getUser/${widget.userId}');
     try {
       final response = await http.get(
         url,
@@ -82,7 +82,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Future<void> fetchRevenueAndOrders() async {
-    final url = Uri.parse('http://localhost:3001/auth/count');
+    final url = Uri.parse('http://10.0.2.2:3001/auth/count');
     try {
       final response = await http.get(url, headers: {
         'Authorization': 'Bearer ${widget.token}',
@@ -91,8 +91,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
         final data = jsonDecode(response.body);
         setState(() {
           totalOrders = data['count'];
-          revenue = data['revenue'].toDouble();
+          revenue = data['revenue'].toDouble() ?? 0.0;
         });
+        print("Revenue and Orders Data: $data");
+
       }
     } catch (error) {
       print("Error fetching revenue and orders: $error");
@@ -100,7 +102,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Future<void> fetchDailySales() async {
-    final url = Uri.parse('http://localhost:3001/auth/dailysaleslatestweek');
+    final url = Uri.parse('http://10.0.2.2:3001/auth/dailysaleslatestweek');
     try {
       final response = await http.get(url, headers: {
         'Authorization': 'Bearer ${widget.token}',
@@ -118,7 +120,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Future<void> fetchMonthlySales() async {
-    final url = Uri.parse('http://localhost:3001/auth/revenuebymonth');
+    final url = Uri.parse('http://10.0.2.2:3001/auth/revenuebymonth');
     try {
       final response = await http.get(url, headers: {
         'Authorization': 'Bearer ${widget.token}',
@@ -136,7 +138,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Future<void> fetchOrderInformation() async {
-    final url = Uri.parse('http://localhost:3001/auth/getorders');
+    final url = Uri.parse('http://10.0.2.2:3001/auth/getorders');
     try {
       final response = await http.get(url, headers: {
         'Authorization': 'Bearer ${widget.token}',

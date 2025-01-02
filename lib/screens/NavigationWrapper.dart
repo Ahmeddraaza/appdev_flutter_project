@@ -1,3 +1,6 @@
+import 'package:appdev_flutter_project/screens/Createorder.dart';
+import 'package:appdev_flutter_project/screens/products.dart';
+import 'package:appdev_flutter_project/screens/userScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart'; // Add this dependency in pubspec.yaml
 import 'dashboardscreen.dart';
@@ -24,11 +27,11 @@ class _NavigationWrapperState extends State<NavigationWrapper> {
     super.initState();
     // Initialize screens, passing userId and token where required
     _screens = [
-      Center(child: Text('Users Screen')), // Placeholder for Users
+      UserScreen(token: widget.token),
       ProfileScreen(userId: widget.userId, token: widget.token),
       DashboardScreen(userId: widget.userId, token: widget.token),
-      Center(child: Text('Create Order Screen')), // Placeholder for Create Order
-      Center(child: Text('Manage Products Screen')), // Placeholder for Manage Products
+      ProductScreen(token: widget.token),
+      CreateOrderScreen(token: widget.token),
     ];
   }
 

@@ -17,8 +17,16 @@ class DailySalesGraphCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    double currentWeekTotal = data.reduce((a, b) => a + b);
-    double percentageChange = ((currentWeekTotal - previousWeekTotal) / previousWeekTotal) * 100;
+    // Ensure data is valid
+    final validData = data.isNotEmpty ? data : [0.0];
+    final maxDataValue = validData.reduce(max);
+
+    // Fallback to prevent division by zero
+    final adjustedMaxValue = maxDataValue > 0 ? maxDataValue : 1;
+
+    double currentWeekTotal = validData.reduce((a, b) => a + b);
+    double percentageChange =
+        ((currentWeekTotal - previousWeekTotal) / (previousWeekTotal > 0 ? previousWeekTotal : 1)) * 100;
 
     return Center(
       child: Container(
@@ -113,13 +121,13 @@ class DailySalesGraphCard extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               crossAxisAlignment: CrossAxisAlignment.end,
-              children: List.generate(data.length, (index) {
-                final barHeight = (data[index] / data.reduce(max)) * 120; // Scale bar height
+              children: List.generate(validData.length, (index) {
+                final barHeight = (validData[index] / adjustedMaxValue) * 120; // Scale bar height
                 return Column(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     Text(
-                      "\$${data[index].toStringAsFixed(0)}",
+                      "\$${validData[index].toStringAsFixed(0)}",
                       style: const TextStyle(
                         fontSize: 12,
                         color: Color(0xFF6C757D),
