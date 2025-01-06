@@ -27,11 +27,11 @@ class _NavigationWrapperState extends State<NavigationWrapper> {
     super.initState();
     // Initialize screens, passing userId and token where required
     _screens = [
-      UserScreen(token: widget.token),
+      UserScreen(userId: widget.userId, token: widget.token),
       ProfileScreen(userId: widget.userId, token: widget.token),
       DashboardScreen(userId: widget.userId, token: widget.token),
-      ProductScreen(token: widget.token),
-      CreateOrderScreen(token: widget.token),
+      ProductScreen(userId: widget.userId, token: widget.token),
+      CreateOrderScreen(userId: widget.userId, token: widget.token),
     ];
   }
 

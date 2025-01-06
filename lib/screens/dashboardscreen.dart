@@ -1,4 +1,5 @@
 import 'package:appdev_flutter_project/screens/bestsellingproduct.dart';
+import 'package:appdev_flutter_project/screens/notification.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -174,33 +175,36 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Future<void> fetchBestSellingProducts() async {
-    try {
-      final productMap = <String, int>{};
-      for (var order in orderData) {
-        for (var product in (order["products"] as List<dynamic>)) {
-          final productName = product["productname"] ?? "Unknown Product";
-          final quantity = (product["quantity"] ?? 0) as int;
+  final url = Uri.parse('http://10.0.2.2:3001/auth/bestsellingproducts');
+  try {
+    final response = await http.get(url, headers: {
+      'Authorization': 'Bearer ${widget.token}',
+    });
 
-          productMap[productName] = (productMap[productName] ?? 0) + quantity;
-        }
-      }
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body) as List;
       setState(() {
-        bestSellingProducts = productMap.entries
-            .map<Map<String, dynamic>>((entry) => {
-                  "productName": entry.key,
-                  "quantity": entry.value,
-                })
-            .toList()
-          ..sort((a, b) => (b["quantity"] as int).compareTo(a["quantity"] as int));
+        bestSellingProducts = data.map<Map<String, dynamic>>((product) {
+          return {
+            "productName": product["Product_name"] ?? "Unknown Product",
+            "quantity": product["quantity"] ?? 0,
+            "price": product["price"] ?? 0.0,
+            "image": product["image"] ?? "",
+          };
+        }).toList();
       });
-    } catch (error) {
-      print("Error fetching best-selling products: $error");
+    } else {
+      print("Failed to fetch best-selling products: ${response.body}");
     }
+  } catch (error) {
+    print("Error fetching best-selling products: $error");
   }
+}
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+   
       backgroundColor: const Color(0xFFF3F8FC),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -209,6 +213,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Custom Header
+                  const SizedBox(height: 60),
                   _buildHeader(),
 
                   const SizedBox(height: 20),
@@ -259,58 +264,95 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Widget _buildHeader() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        border: Border(bottom: BorderSide(color: Color(0xFFEAECF0))),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Text(
-                    fullName,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF2D2D2D),
-                    ),
+  int notificationCount = 1; 
+
+  return Container(
+    width: double.infinity,
+    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+    decoration: const BoxDecoration(
+      color: Colors.white,
+      border: Border(bottom: BorderSide(color: Color(0xFFEAECF0))),
+    ),
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Text(
+                  fullName,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF2D2D2D),
                   ),
-                  const SizedBox(width: 8),
-                  const Icon(
-                    Icons.verified,
-                    color: Color(0xFF6E61FF),
-                    size: 20,
-                  ),
-                ],
-              ),
-              const SizedBox(height: 4),
-              Text(
-                userType,
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
+                ),
+                const SizedBox(width: 8),
+                const Icon(
+                  Icons.verified,
                   color: Color(0xFF6E61FF),
+                  size: 20,
+                ),
+              ],
+            ),
+            const SizedBox(height: 4),
+            Text(
+              userType,
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: Color(0xFF6E61FF),
+              ),
+            ),
+          ],
+        ),
+        Stack(
+          children: [
+            IconButton(
+              icon: const Icon(Icons.notifications, color: Color(0xFF6E61FF)),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => NotificationScreen(token: widget.token),
+                  ),
+                );
+              },
+            ),
+            if (notificationCount > 0) // Show the badge only if there are notifications
+              Positioned(
+                right: 8,
+                top: 8,
+                child: Container(
+                  padding: const EdgeInsets.all(2),
+                  decoration: BoxDecoration(
+                    color: Colors.red,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  constraints: const BoxConstraints(
+                    minWidth: 18,
+                    minHeight: 18,
+                  ),
+                  child: Text(
+                    notificationCount.toString(),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
                 ),
               ),
-            ],
-          ),
-          IconButton(
-            icon: const Icon(Icons.notifications, color: Color(0xFF6E61FF)),
-            onPressed: () {
-              // Handle notification tap
-            },
-          ),
-        ],
-      ),
-    );
-  }
+          ],
+        ),
+      ],
+    ),
+  );
+}
+
 
   String _getMonthName(int monthNumber) {
     final months = [

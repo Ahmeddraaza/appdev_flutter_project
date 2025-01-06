@@ -1,16 +1,15 @@
 import 'package:appdev_flutter_project/model/user.dart';
+import 'package:appdev_flutter_project/screens/NavigationWrapper.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-
-// Import the User model
-
 
 class ProfileScreen extends StatefulWidget {
   final String userId; // User ID passed from the login response
   final String token;  // Token passed from the login response
 
-  const ProfileScreen({Key? key, required this.userId, required this.token}) : super(key: key);
+  const ProfileScreen({Key? key, required this.userId, required this.token})
+      : super(key: key);
 
   @override
   _ProfileScreenState createState() => _ProfileScreenState();
@@ -58,83 +57,108 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFF3F8FC), // Match the dashboard theme
       appBar: AppBar(
-        title: const Text('Profile'),
-        backgroundColor: Color(0xFF7A5AF8), // Adjust color as per your theme
+        backgroundColor: const Color(0xFFF3F8FC), // Adjusted color to match theme
+        elevation: 1,
+        leading: IconButton(
+    icon: const Icon(Icons.arrow_back, color: Colors.black),
+   onPressed: () {
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(
+          builder: (context) => NavigationWrapper(
+            userId: widget.userId,
+            token: widget.token,
+          ),
+        ),
+        (route) => false, // Remove all previous routes
+      );
+   }, 
+        ),
+        title: const Text(
+          'Profile',
+          style: TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
+        ),
+  
       ),
       body: isLoading
-          ? const Center(child: CircularProgressIndicator()) // Show a loading spinner while fetching data
+          ? const Center(
+              child: CircularProgressIndicator(color: Colors.purple),
+            )
           : userData != null
-              ? SingleChildScrollView(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Profile Card
-                      Card(
-                        elevation: 4,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+              ? Center(
+                  child: SingleChildScrollView(
+                    child: Container(
+                      width: 552,
+                      padding: const EdgeInsets.all(40),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(52),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.1),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // User Details Header
+                          Row(
                             children: [
-                              const Text(
-                                'Profile Information',
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
+                              CircleAvatar(
+                                radius: 35,
+                                backgroundColor: Colors.grey[200],
+                                child: const Icon(
+                                  Icons.person,
+                                  size: 50,
+                                  color: Colors.grey,
                                 ),
                               ),
-                              const SizedBox(height: 10),
-                              ProfileField(
-                                label: 'Full Name',
-                                value: userData!.name,
-                              ),
-                              ProfileField(
-                                label: 'Mobile',
-                                value: userData!.phone,
-                              ),
-                              ProfileField(
-                                label: 'Email',
-                                value: userData!.email,
-                              ),
-                              ProfileField(
-                                label: 'Branch ID',
-                                value: userData!.branchId,
-                              ),
-                              ProfileField(
-                                label: 'User Type',
-                                value: userData!.userType,
+                              const SizedBox(width: 16),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    userData!.name,
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontFamily: 'Poppins',
+                                      fontWeight: FontWeight.w400,
+                                      color: Color(0xFF1F2937),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    userData!.email,
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      fontFamily: 'Poppins',
+                                      fontWeight: FontWeight.w400,
+                                      color: Color(0xFF6B7280),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ],
                           ),
-                        ),
+                          const SizedBox(height: 24),
+
+                          // Fields
+                          _buildField('Name', userData!.name),
+                          _buildField('Email Account', userData!.email),
+                          _buildField('Mobile Number', userData!.phone),
+                          _buildField('Branch ID', userData!.branchId),
+                          _buildField('User Type', userData!.userType),
+                          const SizedBox(height: 48),
+
+                          
+                        ],
                       ),
-                      const SizedBox(height: 20),
-                      // Additional content (if needed)
-                      Text(
-                        'Other Information',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      Card(
-                        elevation: 2,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: const Padding(
-                          padding: EdgeInsets.all(16.0),
-                          child: Text('Additional content goes here.'),
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
                 )
               : const Center(
@@ -145,29 +169,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
     );
   }
-}
 
-// A reusable widget for displaying profile fields
-class ProfileField extends StatelessWidget {
-  final String label;
-  final String value;
-
-  const ProfileField({Key? key, required this.label, required this.value}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildField(String label, String value) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      padding: const EdgeInsets.symmetric(vertical: 12),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
-            '$label: ',
-            style: const TextStyle(fontWeight: FontWeight.bold),
+            label,
+            style: const TextStyle(
+              fontSize: 16,
+              fontFamily: 'Poppins',
+              fontWeight: FontWeight.w400,
+              color: Color(0xFF1F2937),
+            ),
           ),
-          Expanded(
-            child: Text(
-              value,
-              style: const TextStyle(color: Colors.black87),
+          Text(
+            value,
+            style: const TextStyle(
+              fontSize: 16,
+              fontFamily: 'Poppins',
+              fontWeight: FontWeight.w400,
+              color: Color(0xFF4B5563),
             ),
           ),
         ],

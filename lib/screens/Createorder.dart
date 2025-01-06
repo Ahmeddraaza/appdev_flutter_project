@@ -1,11 +1,13 @@
+import 'package:appdev_flutter_project/screens/NavigationWrapper.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class CreateOrderScreen extends StatefulWidget {
   final String token;
+  final String userId;
 
-  const CreateOrderScreen({Key? key, required this.token}) : super(key: key);
+  const CreateOrderScreen({Key? key, required this.token, required this.userId}) : super(key: key);
 
   @override
   _CreateOrderScreenState createState() => _CreateOrderScreenState();
@@ -120,148 +122,161 @@ print(orderBody); // Debugging log to check the payload
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  @override
+Widget build(BuildContext context) {
+  return Scaffold(
+    backgroundColor: const Color(0xFFF3F8FC),
+    appBar: AppBar(
       backgroundColor: const Color(0xFFF3F8FC),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFFF3F8FC),
-        elevation: 1,
-        title: const Text(
-          'Create Order',
-          style: TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
+      elevation: 1,
+        leading: IconButton(
+    icon: const Icon(Icons.arrow_back, color: Colors.black),
+   onPressed: () {
+      Navigator.pushAndRemoveUntil(context,
+        MaterialPageRoute(
+          builder: (context) => NavigationWrapper(
+            userId: widget.userId,
+            token: widget.token,
+          ),
         ),
-        
+        (route) => false, // Remove all previous routes
+      );
+   }, 
+        ),
+      title: const Text(
+        'Create Order',
+        style: TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
       ),
-      body: _isLoadingProducts
-          ? const Center(child: CircularProgressIndicator(color: Colors.purple))
-          : SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Customer Name Input
-                    const Text(
-                      "Customer Name",
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+    ),
+    body: _isLoadingProducts
+        ? const Center(child: CircularProgressIndicator(color: Colors.purple))
+        : SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Customer Name Input
+                  const Text(
+                    "Customer Name",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                  TextField(
+                    controller: _customerNameController,
+                    decoration: InputDecoration(
+                      hintText: "Enter customer name",
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
                     ),
-                    const SizedBox(height: 8),
-                    TextField(
-                      controller: _customerNameController,
-                      decoration: InputDecoration(
-                        hintText: "Enter customer name",
-                        border: OutlineInputBorder(
+                  ),
+                  const SizedBox(height: 20),
+
+                  // Create Order Button
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: _isSubmittingOrder ? null : _submitOrder,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF9278F9),
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 20),
-
-                    // Product List
-                    const Text(
-                      "Select Products",
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 8),
-                    ListView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: _products.length,
-                      itemBuilder: (context, index) {
-                        final product = _products[index];
-                        return Card(
-                          color: Colors.white,
-                          elevation: 3,
-                          margin: const EdgeInsets.symmetric(vertical: 8),
-                          child: Padding(
-                            padding: const EdgeInsets.all(12),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      product['Product_name'] ?? 'Unknown',
-                                      style: const TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text("\$${product['price']}"),
-                                  ],
-                                ),
-                              Row(
-  children: [
-    IconButton(
-      onPressed: () {
-        setState(() {
-          final productId = product['prod_id'].toString(); // Convert to String
-          if (_selectedProducts.containsKey(productId)) {
-            if (_selectedProducts[productId]! > 1) {
-              _selectedProducts[productId] = _selectedProducts[productId]! - 1;
-            } else {
-              _selectedProducts.remove(productId);
-            }
-          }
-        });
-      },
-      icon: const Icon(Icons.remove_circle, color: Colors.red),
-    ),
-    Text(
-      _selectedProducts[product['prod_id'].toString()]?.toString() ?? "0", // Convert to String
-      style: const TextStyle(fontSize: 16),
-    ),
-    IconButton(
-      onPressed: () {
-        setState(() {
-          final productId = product['prod_id'].toString(); // Convert to String
-          _selectedProducts[productId] = (_selectedProducts[productId] ?? 0) + 1;
-        });
-      },
-      icon: const Icon(Icons.add_circle, color: Colors.green),
-    ),
-  ],
-),
-
-                              ],
+                      child: _isSubmittingOrder
+                          ? const CircularProgressIndicator(
+                              color: Colors.white,
+                            )
+                          : const Text(
+                              "Create Order",
+                              style: TextStyle(
+                                fontSize: 18,
+                                color: Colors.white,
+                              ),
                             ),
-                          ),
-                        );
-                      },
                     ),
-                    const SizedBox(height: 20),
+                  ),
+                  const SizedBox(height: 20),
 
-                    // Submit Button
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: _isSubmittingOrder ? null : _submitOrder,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF9278F9),
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
+                  // Product List
+                  const Text(
+                    "Select Products",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                  ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: _products.length,
+                    itemBuilder: (context, index) {
+                      final product = _products[index];
+                      return Card(
+                        color: Colors.white,
+                        elevation: 3,
+                        margin: const EdgeInsets.symmetric(vertical: 8),
+                        child: Padding(
+                          padding: const EdgeInsets.all(12),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    product['Product_name'] ?? 'Unknown',
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text("\$${product['price']}"),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  IconButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        final productId = product['prod_id'].toString();
+                                        if (_selectedProducts.containsKey(productId)) {
+                                          if (_selectedProducts[productId]! > 1) {
+                                            _selectedProducts[productId] = _selectedProducts[productId]! - 1;
+                                          } else {
+                                            _selectedProducts.remove(productId);
+                                          }
+                                        }
+                                      });
+                                    },
+                                    icon: const Icon(Icons.remove_circle, color: Colors.red),
+                                  ),
+                                  Text(
+                                    _selectedProducts[product['prod_id'].toString()]?.toString() ?? "0",
+                                    style: const TextStyle(fontSize: 16),
+                                  ),
+                                  IconButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        final productId = product['prod_id'].toString();
+                                        _selectedProducts[productId] = (_selectedProducts[productId] ?? 0) + 1;
+                                      });
+                                    },
+                                    icon: const Icon(Icons.add_circle, color: Colors.green),
+                                  ),
+                                ],
+                              ),
+                            ],
                           ),
                         ),
-                        child: _isSubmittingOrder
-                            ? const CircularProgressIndicator(
-                                color: Colors.white,
-                              )
-                            : const Text(
-                                "Create Order",
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  color: Colors.white,
-                                ),
-                              ),
-                      ),
-                    ),
-                  ],
-                ),
+                      );
+                    },
+                  ),
+                ],
               ),
             ),
-    );
-  }
+          ),
+  );
+}
 }

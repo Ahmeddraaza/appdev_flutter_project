@@ -1,11 +1,13 @@
+import 'package:appdev_flutter_project/screens/NavigationWrapper.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class ProductScreen extends StatefulWidget {
   final String token;
+  final String userId;
 
-  const ProductScreen({Key? key, required this.token}) : super(key: key);
+  const ProductScreen({Key? key, required this.token, required this.userId}) : super(key: key);
 
   @override
   _ProductScreenState createState() => _ProductScreenState();
@@ -179,8 +181,22 @@ class _ProductScreenState extends State<ProductScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF3F8FC),
       appBar: AppBar(
-        backgroundColor: const Color(0xFFF3F8FC),
+      backgroundColor: const Color(0xFFF3F8FC), // Adjusted color to match theme
         elevation: 1,
+        leading: IconButton(
+    icon: const Icon(Icons.arrow_back, color: Colors.black),
+   onPressed: () {
+      Navigator.pushAndRemoveUntil(context,
+        MaterialPageRoute(
+          builder: (context) => NavigationWrapper(
+            userId: widget.userId,
+            token: widget.token,
+          ),
+        ),
+        (route) => false, // Remove all previous routes
+      );
+   }, 
+        ),
         title: const Text(
           'Products',
           style: TextStyle(color: Colors.black),
