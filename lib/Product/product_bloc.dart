@@ -6,7 +6,7 @@ import 'dart:convert';
 
 class ProductBloc extends Bloc<ProductEvent, ProductState> {
   final String token;
-  final String baseUrl = 'http://10.0.2.2:3001/products';
+  final String baseUrl = 'http://localhost:3001/products';
 
   ProductBloc({required this.token}) : super(ProductInitialState()) {
     on<FetchProductsEvent>(_fetchProducts);

@@ -16,7 +16,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
       FetchProfileEvent event, Emitter<ProfileState> emit) async {
     emit(ProfileLoadingState());
 
-    final url = 'http://10.0.2.2:3001/user/getUser/${event.userId}';
+    final url = 'http://localhost:3001/user/getUser/${event.userId}';
 
     try {
       final response = await http.get(

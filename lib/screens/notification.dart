@@ -29,7 +29,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
 
     try {
       final response = await http.get(
-        Uri.parse('http://10.0.2.2:3001/auth/checkproducts'),
+        Uri.parse('http://localhost:3001/auth/checkproducts'),
         headers: {'Authorization': 'Bearer ${widget.token}'},
       );
 

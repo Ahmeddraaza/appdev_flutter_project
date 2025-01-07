@@ -54,7 +54,7 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
   }
 
   Future<Map<String, dynamic>> _fetchUserFullName() async {
-    final url = Uri.parse('http://10.0.2.2:3001/user/getUser/$userId');
+    final url = Uri.parse('http://localhost:3001/user/getUser/$userId');
     final response = await http.get(url, headers: {'Authorization': 'Bearer $token'});
     if (response.statusCode == 200) {
       return jsonDecode(response.body);
@@ -64,7 +64,7 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
   }
 
   Future<Map<String, dynamic>> _fetchRevenueAndOrders() async {
-    final url = Uri.parse('http://10.0.2.2:3001/auth/count');
+    final url = Uri.parse('http://localhost:3001/auth/count');
     final response = await http.get(url, headers: {'Authorization': 'Bearer $token'});
     if (response.statusCode == 200) {
       return jsonDecode(response.body);
@@ -74,7 +74,7 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
   }
 
   Future<List<double>> _fetchDailySales() async {
-    final url = Uri.parse('http://10.0.2.2:3001/auth/dailysaleslatestweek');
+    final url = Uri.parse('http://localhost:3001/auth/dailysaleslatestweek');
     final response = await http.get(url, headers: {'Authorization': 'Bearer $token'});
     if (response.statusCode == 200) {
       return (jsonDecode(response.body) as List<dynamic>)
@@ -86,7 +86,7 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
   }
 
   Future<Map<String, double>> _fetchMonthlySales() async {
-    final url = Uri.parse('http://10.0.2.2:3001/auth/revenuebymonth');
+    final url = Uri.parse('http://localhost:3001/auth/revenuebymonth');
     final response = await http.get(url, headers: {'Authorization': 'Bearer $token'});
     if (response.statusCode == 200) {
       return (jsonDecode(response.body) as Map<String, dynamic>).map(
@@ -98,7 +98,7 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
   }
 
   Future<List<Map<String, dynamic>>> _fetchOrderInformation() async {
-    final url = Uri.parse('http://10.0.2.2:3001/auth/getorders');
+    final url = Uri.parse('http://localhost:3001/auth/getorders');
     final response = await http.get(url, headers: {'Authorization': 'Bearer $token'});
     if (response.statusCode == 200) {
       return (jsonDecode(response.body) as List<dynamic>).map((order) {
@@ -127,7 +127,7 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
   }
 
   Future<List<Map<String, dynamic>>> _fetchBestSellingProducts() async {
-    final url = Uri.parse('http://10.0.2.2:3001/auth/bestsellingproducts');
+    final url = Uri.parse('http://localhost:3001/auth/bestsellingproducts');
     final response = await http.get(url, headers: {'Authorization': 'Bearer $token'});
     if (response.statusCode == 200) {
       return (jsonDecode(response.body) as List<dynamic>).map((product) {

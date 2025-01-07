@@ -7,8 +7,8 @@ import 'create_order_state.dart';
 
 class CreateOrderBloc extends Bloc<CreateOrderEvent, CreateOrderState> {
   final String token;
-  final String productUrl = 'http://10.0.2.2:3001/products/findproducts';
-  final String orderUrl = 'http://10.0.2.2:3001/order/addOrder';
+  final String productUrl = 'http://localhost:3001/products/findproducts';
+  final String orderUrl = 'http://localhost:3001/order/addOrder';
 
   CreateOrderBloc({required this.token}) : super(CreateOrderInitialState()) {
     on<FetchProductsEvent>(_fetchProducts);

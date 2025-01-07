@@ -16,7 +16,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
     emit(UserLoadingState());
     try {
       final response = await http.get(
-        Uri.parse('http://10.0.2.2:3001/auth/getemployees'),
+        Uri.parse('http://localhost:3001/auth/getemployees'),
         headers: {'Authorization': 'Bearer $token'},
       );
 
@@ -36,7 +36,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
 
     try {
       final response = await http.post(
-        Uri.parse('http://10.0.2.2:3001/auth/signUp'),
+        Uri.parse('http://localhost:3001/auth/signUp'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
